@@ -1,12 +1,11 @@
 """
-Instagram Follower Tracker & Simple Analytics
+Instagram Follower Tracker & Analytics
 Interface ultra-simple, claire et directe avec accès mobile et scans programmés.
 """
 
 import streamlit as st
 import os
 import sys
-import importlib
 import pandas as pd
 from datetime import datetime
 
@@ -14,18 +13,6 @@ from datetime import datetime
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
-
-import backend.database
-import backend.auth
-import backend.scraper
-import backend.analytics
-import backend.scheduler
-
-importlib.reload(backend.database)
-importlib.reload(backend.auth)
-importlib.reload(backend.scraper)
-importlib.reload(backend.analytics)
-importlib.reload(backend.scheduler)
 
 from backend.database import (
     init_db,
@@ -58,12 +45,13 @@ from backend.scheduler import (
 
 # Page configuration
 st.set_page_config(
-    page_title="Suivi Instagram - Mobile & Auto",
+    page_title="Suivi Instagram - Simple & Visuel",
     page_icon="📸",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
+# Initialize database tables on startup
 init_db()
 
 # Custom Clean Styling
@@ -125,8 +113,8 @@ with st.sidebar:
     # Manual token login (ideal for cloud/phone without PC)
     with st.expander("🔑 Connexion directe par Jeton (Cloud / Mobile 24/7)"):
         st.caption("Collez votre `sessionid` Instagram pour utiliser l'app hébergée sur le Cloud sans avoir besoin d'ouvrir un navigateur.")
-        input_sid = st.text_input("Jeton sessionid", type="password", help="Ex: 8205680658%3AeYKmZOmFd...", key="input_sid")
-        input_uid = st.text_input("Identifiant ds_user_id", help="Ex: 8205680658", key="input_uid")
+        input_sid = st.text_input("Jeton sessionid", type="password", help="Ex: 8205680658%3AIQkOxf4VhTPPKz...", key="input_sid")
+        input_uid = st.text_input("Identifiant ds_user_id", value="8205680658", key="input_uid")
         input_csrf = st.text_input("csrftoken (optionnel)", type="password", key="input_csrf")
         if st.button("Valider les Jetons", use_container_width=True):
             if input_sid:
@@ -177,7 +165,7 @@ with st.sidebar:
     
     if st.button("⚡ Lancer un Scan Sécurisé", use_container_width=True):
         if not is_valid:
-            st.error("Veuillez d'abord vous connecter dans Brave.")
+            st.error("Veuillez d'abord vous connecter avec votre session.")
         else:
             prog_bar = st.progress(0, text="Démarrage du scan sécurisé...")
             status_placeholder = st.empty()
@@ -242,18 +230,6 @@ with col3:
         <p style="margin:0;"><b>{f_count_2}</b> abonnés &nbsp;|&nbsp; <b>{fl_count_2}</b> abonnements</p>
     </div>
     """, unsafe_allow_html=True)
-
-
-# --- ACCÈS TÉLÉPHONE RAPIDE ---
-with st.expander("📱 Comment ouvrir l'application sur votre Téléphone (iPhone / Android)"):
-    st.markdown("""
-    1. Assurez-vous que votre téléphone est connecté au **même Wi-Fi** que cet ordinateur.
-    2. Ouvrez **Safari** ou **Chrome** sur votre téléphone et tapez l'adresse suivante :
-       ### `http://192.168.1.59:8501`
-    3. **Pour l'avoir comme une vraie application sur votre écran d'accueil** :
-       - Sur iPhone (Safari) : Cliquez sur l'icône de partage 📤 en bas, puis **"Sur l'écran d'accueil"**.
-       - Sur Android (Chrome) : Cliquez sur les 3 petits points en haut à droite, puis **"Ajouter à l'écran d'accueil"**.
-    """)
 
 
 # --- ONGLETS PRINCIPAUX ---
@@ -487,19 +463,19 @@ with tab_recherche:
         matches = []
         for u in f_main:
             if search_q in u["username"].lower() or search_q in u.get("full_name", "").lower():
-                matches.append({"Photo": backend.analytics.get_cached_avatar_base64(u["username"], u.get("profile_pic_url")), "Compte de Salomé": "@salome_2m (Public)", "Relation": "Elle est suivie par cette personne", "Pseudo": f"@{u['username']}", "Nom": u.get("full_name", ""), "Lien Instagram": f"https://www.instagram.com/{u['username']}/"})
+                matches.append({"Photo": u.get("profile_pic_url"), "Compte de Salomé": "@salome_2m (Public)", "Relation": "Elle est suivie par cette personne", "Pseudo": f"@{u['username']}", "Nom": u.get("full_name", ""), "Lien Instagram": f"https://www.instagram.com/{u['username']}/"})
                 
         for u in fl_main:
             if search_q in u["username"].lower() or search_q in u.get("full_name", "").lower():
-                matches.append({"Photo": backend.analytics.get_cached_avatar_base64(u["username"], u.get("profile_pic_url")), "Compte de Salomé": "@salome_2m (Public)", "Relation": "Salomé SUIT cette personne", "Pseudo": f"@{u['username']}", "Nom": u.get("full_name", ""), "Lien Instagram": f"https://www.instagram.com/{u['username']}/"})
+                matches.append({"Photo": u.get("profile_pic_url"), "Compte de Salomé": "@salome_2m (Public)", "Relation": "Salomé SUIT cette personne", "Pseudo": f"@{u['username']}", "Nom": u.get("full_name", ""), "Lien Instagram": f"https://www.instagram.com/{u['username']}/"})
                 
         for u in f_priv:
             if search_q in u["username"].lower() or search_q in u.get("full_name", "").lower():
-                matches.append({"Photo": backend.analytics.get_cached_avatar_base64(u["username"], u.get("profile_pic_url")), "Compte de Salomé": "@salomee__pv (Privé)", "Relation": "Elle est suivie par cette personne", "Pseudo": f"@{u['username']}", "Nom": u.get("full_name", ""), "Lien Instagram": f"https://www.instagram.com/{u['username']}/"})
+                matches.append({"Photo": u.get("profile_pic_url"), "Compte de Salomé": "@salomee__pv (Privé)", "Relation": "Elle est suivie par cette personne", "Pseudo": f"@{u['username']}", "Nom": u.get("full_name", ""), "Lien Instagram": f"https://www.instagram.com/{u['username']}/"})
                 
         for u in fl_priv:
             if search_q in u["username"].lower() or search_q in u.get("full_name", "").lower():
-                matches.append({"Photo": backend.analytics.get_cached_avatar_base64(u["username"], u.get("profile_pic_url")), "Compte de Salomé": "@salomee__pv (Privé)", "Relation": "Salomé SUIT cette personne", "Pseudo": f"@{u['username']}", "Nom": u.get("full_name", ""), "Lien Instagram": f"https://www.instagram.com/{u['username']}/"})
+                matches.append({"Photo": u.get("profile_pic_url"), "Compte de Salomé": "@salomee__pv (Privé)", "Relation": "Salomé SUIT cette personne", "Pseudo": f"@{u['username']}", "Nom": u.get("full_name", ""), "Lien Instagram": f"https://www.instagram.com/{u['username']}/"})
                 
         if matches:
             st.success(f"{len(matches)} résultat(s) trouvé(s) pour '{search_q}' :")
