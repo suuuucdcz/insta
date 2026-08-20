@@ -18,7 +18,7 @@ BATCH_PAUSE_DURATION = (8.0, 15.0)
 
 # Pre-resolved user IDs fallback (bypasses datacenter profile lookup rate limits)
 KNOWN_USER_IDS = {
-    "salome_2m": {"id": "70165997453", "follower_count": 373, "following_count": 403, "is_private": False},
+    "salome_2m": {"id": "53167210268", "follower_count": 373, "following_count": 403, "is_private": False},
     "salomee__pv": {"id": "71043740295", "follower_count": 57, "following_count": 57, "is_private": True},
     "mathis_dryy": {"id": "8205680658", "follower_count": 2000, "following_count": 500, "is_private": True},
 }
