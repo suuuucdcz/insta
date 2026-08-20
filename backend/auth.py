@@ -23,7 +23,30 @@ DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.
 
 
 def get_saved_session() -> Optional[Dict[str, Any]]:
-    """Loads saved session information from session.json if available."""
+    """Loads saved session information from session.json or Streamlit Cloud Secrets."""
+    # 1. Try Streamlit Cloud Secrets (if running on cloud)
+    try:
+        import streamlit as st
+        if hasattr(st, "secrets") and "sessionid" in st.secrets:
+            sid = st.secrets["sessionid"]
+            uid = st.secrets.get("ds_user_id", "8205680658")
+            csrf = st.secrets.get("csrftoken", "")
+            return {
+                "logged_in_user_id": uid,
+                "logged_in_username": st.secrets.get("username", "mathis_dryy"),
+                "user_agent": DEFAULT_USER_AGENT,
+                "app_id": DEFAULT_IG_APP_ID,
+                "cookies": {
+                    "sessionid": sid,
+                    "ds_user_id": uid,
+                    "csrftoken": csrf,
+                },
+                "updated_at": "Streamlit Cloud Secrets"
+            }
+    except Exception:
+        pass
+
+    # 2. Local session.json file
     if not os.path.exists(SESSION_FILE):
         return None
     try:
