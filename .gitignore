@@ -1,0 +1,15 @@
+# Python & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Local session & browser profile (Security: Keep private)
+data/browser_profile/
+data/session.json
+data/*.db
+data/avatars/
+
+# OS files
+.DS_Store
+Thumbs.db
